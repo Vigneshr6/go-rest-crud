@@ -2,8 +2,8 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"vignesh.com/jwt-auth/message"
-	"vignesh.com/jwt-auth/user"
+	"vignesh.com/gocrudrest/message"
+	"vignesh.com/gocrudrest/user"
 )
 
 func main() {

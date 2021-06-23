@@ -6,11 +6,12 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	"vignesh.com/jwt-auth/datasource"
+	log "github.com/sirupsen/logrus"
+	"vignesh.com/gocrudrest/datasource"
 )
 
 func init() {
-	fmt.Println("msg controller init")
+	log.Debug("msg controller init")
 }
 
 func Routes(app *gin.Engine) {
@@ -25,18 +26,19 @@ func Routes(app *gin.Engine) {
 func getAllUsers(ctx *gin.Context) {
 	rows, err := datasource.GetConn().Queryx("select * from users")
 	if err != nil {
-		fmt.Println("error fetching data : " + err.Error())
+		log.Error("error fetching data : " + err.Error())
 	}
 	defer rows.Close()
 	var response []User
 	for rows.Next() {
 		var u User
 		if err := rows.StructScan(&u); err != nil {
-			fmt.Println("error scanning rows : " + err.Error())
+			log.Error("error scanning rows : " + err.Error())
 		}
-		fmt.Println(u)
+		log.Debug(u)
 		response = append(response, u)
 	}
+	log.Infof("Users count : %d", len(response))
 	ctx.JSON(200, response)
 }
 
@@ -47,7 +49,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	fmt.Println(u)
+	log.Info(u)
 	stmt, err := datasource.GetConn().PrepareNamed("insert into users (name,gender) values (:name,:gender) Returning id")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -60,6 +62,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
+	log.WithFields(log.Fields{"userId": u.Id}).Info(u.Name)
 	ctx.JSON(http.StatusCreated, u)
 }
 
@@ -83,7 +86,7 @@ func updateUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	fmt.Println(res.RowsAffected())
+	log.Debug(res.RowsAffected())
 	ctx.JSON(http.StatusOK, &u)
 }
 
@@ -101,7 +104,7 @@ func getUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	fmt.Println(u)
+	log.Debug(u)
 	ctx.JSON(http.StatusOK, &u)
 }
 
