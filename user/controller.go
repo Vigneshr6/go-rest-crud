@@ -11,6 +11,7 @@ import (
 )
 
 func init() {
+	log.SetLevel(log.DebugLevel)
 	log.Debug("msg controller init")
 }
 
@@ -49,7 +50,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Info(u)
+	log.Infof("input : %+v", u)
 	stmt, err := datasource.GetConn().PrepareNamed("insert into users (name,gender) values (:name,:gender) Returning id")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -62,7 +63,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.WithFields(log.Fields{"userId": u.Id}).Info(u.Name)
+	log.WithFields(log.Fields{"userId": u.Id}).Infof("input : %+v", u)
 	ctx.JSON(http.StatusCreated, u)
 }
 
@@ -104,7 +105,7 @@ func getUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Debug(u)
+	log.Debugf("user : %+v", u)
 	ctx.JSON(http.StatusOK, &u)
 }
 
