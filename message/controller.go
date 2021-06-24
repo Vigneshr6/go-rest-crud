@@ -1,13 +1,12 @@
 package message
 
 import (
-	"fmt"
-
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {
-	fmt.Println("msg controller init")
+	log.Debug("msg controller init")
 }
 
 func Routes(app *gin.Engine) {

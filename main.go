@@ -1,10 +1,17 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/gin-gonic/gin"
+	_ "vignesh.com/gocrudrest/config"
 	"vignesh.com/gocrudrest/message"
 	"vignesh.com/gocrudrest/user"
 )
+
+func init() {
+	fmt.Println("main init")
+}
 
 func main() {
 	app := gin.Default()
