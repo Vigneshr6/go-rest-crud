@@ -1,18 +1,18 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"net/http"
 	"strconv"
 
 	"github.com/gin-gonic/gin"
-	log "github.com/sirupsen/logrus"
+	"vignesh.com/gocrudrest/common/log"
 	"vignesh.com/gocrudrest/datasource"
 )
 
 func init() {
-	log.SetLevel(log.DebugLevel)
-	log.Debug("msg controller init")
+	log.Debug(context.Background(), "msg controller init")
 }
 
 func Routes(app *gin.Engine) {
@@ -27,19 +27,19 @@ func Routes(app *gin.Engine) {
 func getAllUsers(ctx *gin.Context) {
 	rows, err := datasource.GetConn().Queryx("select * from users")
 	if err != nil {
-		log.Error("error fetching data : " + err.Error())
+		log.Error(ctx, "error fetching data : "+err.Error())
 	}
 	defer rows.Close()
 	var response []User
 	for rows.Next() {
 		var u User
 		if err := rows.StructScan(&u); err != nil {
-			log.Error("error scanning rows : " + err.Error())
+			log.Error(ctx, "error scanning rows : "+err.Error())
 		}
-		log.Debug(u)
+		log.Debug(ctx, u)
 		response = append(response, u)
 	}
-	log.Infof("Users count : %d", len(response))
+	log.Infof(ctx, "Users count : %d", len(response))
 	ctx.JSON(200, response)
 }
 
@@ -50,7 +50,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Infof("input : %+v", u)
+	log.Infof(ctx, "input : %+v", u)
 	stmt, err := datasource.GetConn().PrepareNamed("insert into users (name,gender) values (:name,:gender) Returning id")
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -63,7 +63,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.WithFields(log.Fields{"userId": u.Id}).Infof("input : %+v", u)
+	log.Infof(ctx, "userId: %s :: input : %+v", u.Id, u)
 	ctx.JSON(http.StatusCreated, u)
 }
 
@@ -87,7 +87,8 @@ func updateUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Debug(res.RowsAffected())
+	n, _ := res.RowsAffected()
+	log.Debug(ctx, n)
 	ctx.JSON(http.StatusOK, &u)
 }
 
@@ -105,7 +106,7 @@ func getUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Debugf("user : %+v", u)
+	log.Debugf(ctx, "user : %+v", u)
 	ctx.JSON(http.StatusOK, &u)
 }
 
