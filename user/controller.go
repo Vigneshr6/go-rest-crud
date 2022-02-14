@@ -63,7 +63,7 @@ func createUser(ctx *gin.Context) {
 			"error": err.Error(),
 		})
 	}
-	log.Infof(ctx, "userId: %s :: input : %+v", u.Id, u)
+	log.Infof(ctx, "userId: %d :: input : %+v", u.Id, u)
 	ctx.JSON(http.StatusCreated, u)
 }
 
